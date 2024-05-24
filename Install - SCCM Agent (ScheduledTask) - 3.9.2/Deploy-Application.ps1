@@ -11,7 +11,7 @@ PSApppDeployToolkit - This script performs the installation or uninstallation of
 
 The script dot-sources the AppDeployToolkitMain.ps1 script which contains the logic and functions required to install or uninstall an application.
 
-PSApppDeployToolkit is licensed under the GNU LGPLv3 License - (C) 2024 PSAppDeployToolkit Team (Sean Lillis, Dan Cunningham and Muhammad Mashwani).
+PSApppDeployToolkit is licensed under the GNU LGPLv3 License - (C) 2023 PSAppDeployToolkit Team (Sean Lillis, Dan Cunningham and Muhammad Mashwani).
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the
 Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but
@@ -108,14 +108,14 @@ Try {
     ##*===============================================
     ## Variables: Application
     [String]$appVendor = 'Microsoft'
-    [String]$appName = 'Endpoint Manager Configuration Manager Console'
-    [String]$appVersion = '1.0'
+    [String]$appName = 'SCCM agent'
+    [String]$appVersion = ''
     [String]$appArch = ''
     [String]$appLang = 'EN'
     [String]$appRevision = '01'
     [String]$appScriptVersion = '1.0.0'
-    [String]$appScriptDate = '04/08/2021'
-    [String]$appScriptAuthor = 'Chris Chisholm'
+    [String]$appScriptDate = 'XX/XX/20XX'
+    [String]$appScriptAuthor = '<author name>'
     ##*===============================================
     ## Variables: Install Titles (Only set here to override defaults set by the toolkit)
     [String]$installName = ''
@@ -129,8 +129,8 @@ Try {
 
     ## Variables: Script
     [String]$deployAppScriptFriendlyName = 'Deploy Application'
-    [Version]$deployAppScriptVersion = [Version]'3.10.1'
-    [String]$deployAppScriptDate = '05/03/2024'
+    [Version]$deployAppScriptVersion = [Version]'3.9.2'
+    [String]$deployAppScriptDate = '02/02/2023'
     [Hashtable]$deployAppScriptParameters = $PsBoundParameters
 
     ## Variables: Environment
@@ -174,7 +174,7 @@ Try {
     ##*===============================================
     ##* END VARIABLE DECLARATION
     ##*===============================================
-    $DefaultSiteServerName = "<FQDN Site Server Name>"
+
     If ($deploymentType -ine 'Uninstall' -and $deploymentType -ine 'Repair') {
         ##*===============================================
         ##* PRE-INSTALLATION
@@ -188,11 +188,6 @@ Try {
         Show-InstallationProgress
 
         ## <Perform Pre-Installation tasks here>
-        #Remove old ConfigMgr 2012 R2 Consoles
-        Remove-MSIApplications -Name "System Center Configuration Manager Console" -Exact
-        #Remove old ConfigMgr CB Consoles
-        Remove-MSIApplications -Name "Microsoft Endpoint Configuration Manager Console" -Exact
-        Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
 
 
         ##*===============================================
@@ -211,7 +206,9 @@ Try {
         }
 
         ## <Perform Installation tasks here>
-        Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
+        Copy-File -Path "$dirFiles\ccmsetup.exe" -Destination "$($envSystemRoot)\CCMSetup"
+        New-ScheduledTask -TaskName "Configuration Manager Client Retry Task" -TaskPath "\Microsoft\Configuration Manager\" -TaskExecute "$($envSystemRoot)\CCMSetup\ccmsetup.exe" -TaskExecuteArguments "<Arguments>"
+        Set-RegistryKey -Key "HKEY_LOCAL_MACHINE\SOFTWARE\<CUSTOMERNAME>\IntuneAppDeploy" -Name "InstallConfigMgrScheduledTask" -Value $(Get-Date) -Type String
 
 
         ##*===============================================
@@ -222,9 +219,9 @@ Try {
         ## <Perform Post-Installation tasks here>
 
         ## Display a message at the end of the install
-        # If (-not $useDefaultMsi) {
-        #     Show-InstallationPrompt -Message 'You can customize text to appear at the end of an install or remove it completely for unattended installations.' -ButtonRightText 'OK' -Icon Information -NoWait
-        # }
+        If (-not $useDefaultMsi) {
+            #   Show-InstallationPrompt -Message 'You can customize text to appear at the end of an install or remove it completely for unattended installations.' -ButtonRightText 'OK' -Icon Information -NoWait
+        }
     }
     ElseIf ($deploymentType -ieq 'Uninstall') {
         ##*===============================================
@@ -255,7 +252,7 @@ Try {
         }
 
         ## <Perform Uninstallation tasks here>
-        Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
+
 
         ##*===============================================
         ##* POST-UNINSTALLATION
@@ -293,9 +290,6 @@ Try {
             Execute-MSI @ExecuteDefaultMSISplat
         }
         ## <Perform Repair tasks here>
-        Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
-
-        Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
 
         ##*===============================================
         ##* POST-REPAIR
