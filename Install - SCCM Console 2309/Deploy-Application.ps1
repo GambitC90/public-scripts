@@ -174,7 +174,7 @@ Try {
     ##*===============================================
     ##* END VARIABLE DECLARATION
     ##*===============================================
-
+    $DefaultSiteServerName = "<FQDN Site Server Name>"
     If ($deploymentType -ine 'Uninstall' -and $deploymentType -ine 'Repair') {
         ##*===============================================
         ##* PRE-INSTALLATION
@@ -211,7 +211,6 @@ Try {
         }
 
         ## <Perform Installation tasks here>
-        $DefaultSiteServerName = "CMCBSSP01.contoso.com"
         Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
 
 
@@ -296,7 +295,6 @@ Try {
         ## <Perform Repair tasks here>
         Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
 
-        $DefaultSiteServerName = "CMCBSSP01.contoso.com"
         Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
 
         ##*===============================================
