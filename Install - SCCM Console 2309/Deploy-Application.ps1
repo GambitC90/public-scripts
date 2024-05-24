@@ -99,7 +99,8 @@ Try {
     ## Set the script execution policy for this process
     Try {
         Set-ExecutionPolicy -ExecutionPolicy 'ByPass' -Scope 'Process' -Force -ErrorAction 'Stop'
-    } Catch {
+    }
+    Catch {
     }
 
     ##*===============================================
@@ -187,11 +188,11 @@ Try {
         Show-InstallationProgress
 
         ## <Perform Pre-Installation tasks here>
-		#Remove old ConfigMgr 2012 R2 Consoles
-		Remove-MSIApplications -Name "System Center Configuration Manager Console" -Exact
-		#Remove old ConfigMgr CB Consoles
-		Remove-MSIApplications -Name "Microsoft Endpoint Configuration Manager Console" -Exact
-		Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
+        #Remove old ConfigMgr 2012 R2 Consoles
+        Remove-MSIApplications -Name "System Center Configuration Manager Console" -Exact
+        #Remove old ConfigMgr CB Consoles
+        Remove-MSIApplications -Name "Microsoft Endpoint Configuration Manager Console" -Exact
+        Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
 
 
         ##*===============================================
@@ -210,8 +211,8 @@ Try {
         }
 
         ## <Perform Installation tasks here>
-		$DefaultSiteServerName="CMCBSSP01.contoso.com"
-		Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
+        $DefaultSiteServerName = "CMCBSSP01.contoso.com"
+        Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
 
 
         ##*===============================================
@@ -255,7 +256,7 @@ Try {
         }
 
         ## <Perform Uninstallation tasks here>
-		Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
+        Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
 
         ##*===============================================
         ##* POST-UNINSTALLATION
@@ -293,10 +294,10 @@ Try {
             Execute-MSI @ExecuteDefaultMSISplat
         }
         ## <Perform Repair tasks here>
-		Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
+        Remove-MSIApplications -Name "Microsoft Configuration Manager Console" -Exact
 
-        $DefaultSiteServerName="CMCBSSP01.contoso.com"
-		Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
+        $DefaultSiteServerName = "CMCBSSP01.contoso.com"
+        Execute-Process -Path "$dirFiles\ConsoleSetup.exe" -Parameters "/q TargetDir=""C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole"" DefaultSiteServerName=$DefaultSiteServerName"
 
         ##*===============================================
         ##* POST-REPAIR
